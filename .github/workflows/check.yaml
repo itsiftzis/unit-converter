@@ -15,5 +15,4 @@ jobs:
           java-version: 13
       - uses: eskatos/gradle-command-action@v1
         with:
-          wrapper-directory: .
           arguments: build
