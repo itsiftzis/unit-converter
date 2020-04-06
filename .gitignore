@@ -1,1 +1,5 @@
 .idea
+.gradle
+build
+Unit Converter/task/build
+Unit Converter/task/out
