@@ -16,4 +16,4 @@ jobs:
       - uses: eskatos/gradle-command-action@v1
         with:
           wrapper-directory: .
-          arguments: [build check]
+          arguments: build check
