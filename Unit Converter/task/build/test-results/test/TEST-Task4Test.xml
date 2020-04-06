@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Task4Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-04-06T15:31:12" hostname="ioanniss-mbp" time="1.23">
+<testsuite name="Task4Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-04-06T15:35:46" hostname="ioanniss-mbp" time="0.717">
   <properties/>
-  <testcase name="start" classname="Task4Test" time="1.23"/>
+  <testcase name="start" classname="Task4Test" time="0.717"/>
   <system-out><![CDATA[?[1;31m
 Start test 1?[0m
 Enter what you want to convert (or exit):
