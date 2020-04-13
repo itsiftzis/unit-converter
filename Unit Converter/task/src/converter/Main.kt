@@ -3,27 +3,11 @@ package converter
 import java.util.*
 import kotlin.system.exitProcess
 
-//mass units
-private val gramAliases = listOf("gram", "grams", "g")
-private val kilogramAliases = listOf("kilogram", "kilograms", "kg")
-private val milligramAliases = listOf("milligram", "milligrams", "mg")
-private val poundAliases = listOf("pound", "pounds", "lb")
-private val ounceAliases = listOf("ounce", "ounces", "oz")
-
-//distance units
-private val meterAliases = listOf("meter", "meters", "m")
-private val kilometerAliases = listOf("kilometer", "kilometers", "km")
-private val centimeterAliases = listOf("centimeter", "centimeters", "cm")
-private val millimeterAliases = listOf("millimeter", "millimeters", "mm")
-private val yardAliases = listOf("yard", "yards", "yd")
-private val mileAliases = listOf("mile", "miles", "mi")
-private val footAliases = listOf("foot", "feet", "ft")
-private val inchAliases = listOf("inch", "inches", "in")
-
-private val unitsToGramsTable = mapOf("gram" to 1.0, "kilogram" to 1000.0, "milligram" to 0.001, "pound" to 453.592, "ounce" to 28.3495)
-private val gramsToReferenceUnitTable = mapOf("gram" to 1.0, "kilogram" to 0.001, "milligram" to 1000.0, "pound" to 1.0.div(453.592), "ounce" to 1.0.div(28.3495))
-private val unitsToMetersTable = mapOf("meter" to 1.0, "kilometer" to 1000.0, "centimeter" to 0.01, "millimeter" to 0.001, "yard" to 0.9144, "mile" to 1609.34, "foot" to 0.3048, "inch" to 0.0254)
-private val metersToReferenceUnitTable = mapOf("meter" to 1.0, "kilometer" to 0.001, "centimeter" to 100.0, "millimeter" to 1000.0, "yard" to 1.0.div(0.9144), "mile" to 1.0.div(0.3048), "inch" to 1.0.div(0.0254))
+private val unitsToGramsTable = mapOf(MeasurementUnits.GRAM to 1.0, MeasurementUnits.GRAMS to 1.0, MeasurementUnits.G to 1.0, MeasurementUnits.KILOGRAM to 1000.0,
+        MeasurementUnits.KG to 1000.0, MeasurementUnits.KILOGRAMS to 1000.0, MeasurementUnits.MILLIGRAM to 0.001, MeasurementUnits.MILLIGRAMS to 0.001, MeasurementUnits.MG to 0.001, MeasurementUnits.POUND to 453.592, MeasurementUnits.POUNDS to 453.592, MeasurementUnits.LB to 453.592, MeasurementUnits.OUNCE to 28.3495, MeasurementUnits.OUNCES to 28.3495, MeasurementUnits.OZ to 28.3495,
+        MeasurementUnits.METER to 1.0, MeasurementUnits.METERS to 1.0, MeasurementUnits.M to 1.0, MeasurementUnits.CENTIMETER to 0.01, MeasurementUnits.CENTIMETERS to 0.01, MeasurementUnits.CM to 0.01, MeasurementUnits.MILLIMETER to 0.001, MeasurementUnits.MILLIMETERS to 0.001, MeasurementUnits.MM to 0.001, MeasurementUnits.YARD to 0.9144, MeasurementUnits.YARDS to 0.9144, MeasurementUnits.YD to 0.9144, MeasurementUnits.MILE to 1609.34, MeasurementUnits.MILES to 1609.34, MeasurementUnits.MI to 1609.34, MeasurementUnits.FOOT to 0.3048, MeasurementUnits.FEET to 0.3048, MeasurementUnits.FT to 0.3048, MeasurementUnits.INCH to 0.0254, MeasurementUnits.INCHES to 0.0254, MeasurementUnits.IN to 0.0254)
+private val gramsToReferenceUnitTable = mapOf(MeasurementUnits.GRAM to 1.0, MeasurementUnits.KILOGRAM to 0.001, MeasurementUnits.MILLIGRAM to 1000.0, MeasurementUnits.POUND to 1.0.div(453.592), MeasurementUnits.OUNCE to 1.0.div(28.3495),
+        MeasurementUnits.METER to 1.0, MeasurementUnits.KILOMETER to 0.001, MeasurementUnits.CENTIMETER to 100.0, MeasurementUnits.MILLIMETER to 1000.0, MeasurementUnits.YARD to 1.0.div(0.9144), MeasurementUnits.MILE to 1.0.div(0.3048), MeasurementUnits.INCH to 1.0.div(0.0254))
 
 fun main() {
     val scanner = Scanner(System.`in`)
@@ -35,123 +19,44 @@ fun main() {
         } else {
             val doubleSourceAmount = sourceAmount.toDouble()
             val sourceUnit = scanner.next()
-
-            scanner.next()
-            val targetUnit = scanner.next()
-
-            val convertedAmount = convertToReferenceUnit(doubleSourceAmount, sourceUnit.toLowerCase())
-            val targetUnitsConverted = convertToUnit(convertedAmount.split(" ")[0].toDouble(), targetUnit.toLowerCase())
-            println("$doubleSourceAmount ${convertedAmount.split(" ")[1]} is $targetUnitsConverted")
-            println("Enter what you want to convert (or exit):")
+            if (sourceUnit.startsWith("degree")) {
+                val sourceUnitName = scanner.next()
+            } else {
+                scanner.next()
+                val targetUnit = scanner.next()
+                if (targetUnit.startsWith("degree")) {
+                    val targetUnitName = scanner.next()
+                } else {
+                    val convertedAmount = convertToReferenceUnit(doubleSourceAmount, sourceUnit.toUpperCase())
+                    val targetUnitsConverted = convertToUnit(convertedAmount.split(" ")[0].toDouble(), targetUnit.toUpperCase())
+                    println("$doubleSourceAmount ${convertedAmount.split(" ")[1]} is $targetUnitsConverted")
+                    println("Enter what you want to convert (or exit):")
+                }
+            }
         }
     }
 }
 
-fun convertToUnit(convertedVolume: Double, targetUnit: String?): String {
+fun convertToUnit(convertedVolume: Double, targetUnit: String): String {
     return when {
-        gramAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(gramsToReferenceUnitTable[gramAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, gramAliases)
-        }
-        kilogramAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(gramsToReferenceUnitTable[kilogramAliases[0]]
+        MeasurementUnits.values().contains(MeasurementUnits.valueOf(targetUnit)) -> {
+            val result = convertedVolume.times(gramsToReferenceUnitTable[MeasurementUnits.valueOf(targetUnit.removeSuffix("S"))]
                     ?: 1.0)
-            result.toString() + "  " + plurality(result, kilogramAliases)
-        }
-        milligramAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(gramsToReferenceUnitTable[milligramAliases[0]]
-                    ?: 1.0)
-            result.toString() + " " + plurality(result, milligramAliases)
-        }
-        poundAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(gramsToReferenceUnitTable[poundAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, poundAliases)
-        }
-        ounceAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(
-                    gramsToReferenceUnitTable[ounceAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, ounceAliases)
-        }
-        yardAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(metersToReferenceUnitTable[yardAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, yardAliases)
-        }
-        meterAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(metersToReferenceUnitTable[meterAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, meterAliases)
-        }
-        centimeterAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(metersToReferenceUnitTable[centimeterAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, centimeterAliases)
-        }
-        footAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(metersToReferenceUnitTable[footAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, footAliases)
-        }
-        inchAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(metersToReferenceUnitTable[inchAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, inchAliases)
-        }
-        millimeterAliases.contains(targetUnit) -> {
-            val result = convertedVolume.times(metersToReferenceUnitTable[millimeterAliases[0]] ?: 1.0)
-            result.toString() + " " + plurality(result, millimeterAliases)
+            result.toString() + " " + if (result == 1.0) MeasurementUnits.valueOf(targetUnit).defaultValue else MeasurementUnits.valueOf(targetUnit).defaultValue + "s"
         }
         else -> "$convertedVolume"
     }
 }
 
-fun convertToReferenceUnit(sourceAmount: Double, sourceUnit: String?): String {
+fun convertToReferenceUnit(sourceAmount: Double, sourceUnit: String): String {
     return when {
-        gramAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToGramsTable[gramAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, gramAliases)
-        }
-        kilogramAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToGramsTable[kilogramAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, kilogramAliases)
-        }
-        milligramAliases.contains(sourceUnit) -> {
-            sourceAmount.times(
-                    unitsToGramsTable[milligramAliases[0]]
-                            ?: 1.0).toString() + " " + plurality(sourceAmount, milligramAliases)
-        }
-        poundAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToGramsTable[poundAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, poundAliases)
-        }
-        ounceAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToGramsTable[ounceAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, ounceAliases)
-        }
-        yardAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToMetersTable[yardAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, yardAliases)
-        }
-        meterAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToMetersTable[meterAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, meterAliases)
-        }
-        centimeterAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToMetersTable[centimeterAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, centimeterAliases)
-        }
-        footAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToMetersTable[footAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, footAliases)
-        }
-        inchAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToMetersTable[inchAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, inchAliases)
-        }
-        millimeterAliases.contains(sourceUnit) -> {
-            sourceAmount.times(unitsToMetersTable[millimeterAliases[0]]
-                    ?: 1.0).toString() + " " + plurality(sourceAmount, millimeterAliases)
+        MeasurementUnits.values().contains(MeasurementUnits.valueOf(sourceUnit)) -> {
+            sourceAmount.times(unitsToGramsTable[MeasurementUnits.valueOf(sourceUnit.removeSuffix("" +
+                    "S"))]
+                    ?: 1.0).toString() + " " + if (sourceAmount == 1.0) MeasurementUnits.valueOf(sourceUnit).defaultValue else MeasurementUnits.valueOf(sourceUnit).defaultValue + "s"
         }
         else -> {
             "$sourceAmount"
         }
     }
 }
-
-private fun plurality(sourceAmount: Double, aliases: List<String>) =
-        if (sourceAmount == 1.0) aliases[0] else aliases[1]
